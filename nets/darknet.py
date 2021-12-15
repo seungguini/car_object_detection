@@ -1,13 +1,15 @@
 import math
 from collections import OrderedDict
-
 import torch.nn as nn
 
-
 #---------------------------------------------------------------------#
-#   残差结构
-#   利用一个1x1卷积下降通道数，然后利用一个3x3卷积提取特征并且上升通道数
-#   最后接上一个残差边
+#   Credit User @Bubbliiiing GitHub
+#   Basic Block for Residual Network
+#   In each Basic Block, we first apply a 1x1 Conv to reduce the number of channels
+#   Then apply a 3x3 Conv to extract the features and upscale the number of channels
+#   Lastly, add the residual from previous layers
+#   Here we use Residual Network (a.k.a ResNet) in order to prevent the problem of vanishing gradient/exploding gradient
+#   which is common in neural networks with many layers
 #---------------------------------------------------------------------#
 class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes):
@@ -56,7 +58,7 @@ class DarkNet(nn.Module):
 
         self.layers_out_filters = [64, 128, 256, 512, 1024]
 
-        # 进行权值初始化
+        # init the weights
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -66,16 +68,16 @@ class DarkNet(nn.Module):
                 m.bias.data.zero_()
 
     #---------------------------------------------------------------------#
-    #   在每一个layer里面，首先利用一个步长为2的3x3卷积进行下采样
-    #   然后进行残差结构的堆叠
+    #   In each layer, we first apply a 3x3 Conv with stride 2 to reduce the plane size.
+    #   Then we add residual on top of that to form a ResNet block
     #---------------------------------------------------------------------#
     def _make_layer(self, planes, blocks):
         layers = []
-        # 下采样，步长为2，卷积核大小为3
+
         layers.append(("ds_conv", nn.Conv2d(self.inplanes, planes[1], kernel_size=3, stride=2, padding=1, bias=False)))
         layers.append(("ds_bn", nn.BatchNorm2d(planes[1])))
         layers.append(("ds_relu", nn.LeakyReLU(0.1)))
-        # 加入残差结构
+
         self.inplanes = planes[1]
         for i in range(0, blocks):
             layers.append(("residual_{}".format(i), BasicBlock(self.inplanes, planes)))
