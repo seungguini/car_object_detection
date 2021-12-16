@@ -54,7 +54,7 @@ def train():
     # and only train on classification network
     # modify Freeze_epoch to specify how much epochs you wanna train
     Init_Epoch = 0
-    Freeze_Epoch = 20
+    Freeze_Epoch = 30
     Freeze_batch_size = 4
     Freeze_lr = 1e-3
 
@@ -63,7 +63,7 @@ def train():
     # This is when all the weights in the network will change
     # modify UnFreeze_epoch to specify how much epochs you wanna train
     # (number of epochs in unfreeze part = UnFreeze_Epoch - Freeze_Epoch)
-    UnFreeze_Epoch = 40
+    UnFreeze_Epoch = 60
     Unfreeze_batch_size = 2
     Unfreeze_lr = 1e-4
 
@@ -109,7 +109,6 @@ def train():
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-
     loss_list = []
     val_loss_list = []
 

@@ -58,7 +58,6 @@ class YOLO(object):
 		self.bbox_util = DecodeBox(self.anchors, self.num_classes,
 								   (self.input_shape[0], self.input_shape[1]), self.anchors_mask)
 
-
 		hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
 		self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
 		self.colors = list(
